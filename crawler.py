@@ -62,7 +62,11 @@ def send_request(start_page, end_page):
                 title_ele = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-title').text.strip()
                 if title_ele in ("Mức giá","Diện tích", "Số toilet", "Số phòng ngủ"):
                     value = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-value').text.strip()
-                    value = float(value.split(' ')[0].replace(',', '.'))
+                    value_str = value.split(' ')[0].replace(',', '.')
+                    try:
+                        value = float(value_str)
+                    except ValueError:
+                        pass
                     property_details[title_ele] = value
                 if title_ele == "Nội thất":
                     value = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-value').text.strip()
