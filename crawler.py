@@ -3,10 +3,11 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import pandas as pd
 from tqdm import tqdm 
+import re
 import numpy as np 
 
 # Đường dẫn tới ChromeDriver
-chrome_driver_path = '/usr/local/bin/chromedriver'
+chrome_driver_path = '/Users/nguyenngochoang/Documents/NMKHDL/chromedriver'
 
 # Tạo instance của WebDriver
 service = Service(executable_path=chrome_driver_path)
@@ -28,54 +29,60 @@ def send_request(start_page, end_page):
 
         for url in tqdm(urls):
             driver.get(url)  # Mở link chi tiết
-            # Lấy tiêu đề
-            items = driver.find_elements(By.CSS_SELECTOR, 'div.re__pr-short-info-item.js__pr-config-item')
 
-            title, date = None, None
+            #Kiểm tra link hết hạn
+            current_url = driver.current_url
+            if url != current_url:
+                continue
+            else:
+                # Lấy tiêu đề
+                items = driver.find_elements(By.CSS_SELECTOR, 'div.re__pr-short-info-item.js__pr-config-item')
 
-            for item in items: 
-                title_element = item.find_element(By.CLASS_NAME, 'title')
-                if title_element.text.strip() == "Mã tin":
-                    # If title is "Mã tin", get the corresponding value
-                    value_element = item.find_element(By.CLASS_NAME, 'value')
-                    title = value_element.text.strip()
-                elif title_element.text.strip() == "Ngày đăng": 
-                    value_element = item.find_element(By.CLASS_NAME, 'value')
-                    date = value_element.text.strip()
-                if title and date: break 
+                title, date = None, None
 
+                for item in items: 
+                    title_element = item.find_element(By.CLASS_NAME, 'title')
+                    if title_element.text.strip() == "Mã tin":
+                        # If title is "Mã tin", get the corresponding value
+                        value_element = item.find_element(By.CLASS_NAME, 'value')
+                        title = value_element.text.strip()
+                    elif title_element.text.strip() == "Ngày đăng": 
+                        value_element = item.find_element(By.CLASS_NAME, 'value')
+                        date = value_element.text.strip()
+                    if title and date: break 
 
-            # Lấy địa chỉ
-            address = driver.find_element(By.CSS_SELECTOR, 'span.re__pr-short-description.js__pr-address').text.strip()
+                # Lấy địa chỉ
+                address = driver.find_element(By.CSS_SELECTOR, 'span.re__pr-short-description.js__pr-address').text.strip()
+                
+                #Lấy mức giá, nội thất, diện tích
+                property_details = {
+                    "Mức giá": np.nan,
+                    "Diện tích": np.nan,
+                    "Nội thất":"Không",
+                    "Số toilet": np.nan,
+                    "Số phòng ngủ": np.nan 
+                }
 
-            #Lấy mức giá, nội thất, diện tích
-            property_details = {
-                "Mức giá": np.nan,
-                "Diện tích": np.nan,
-                "Nội thất":"Không",
-                "Số toilet": np.nan,
-                "Số phòng ngủ": np.nan 
-            }
+                specs = driver.find_elements(By.CSS_SELECTOR, 'div.re__pr-specs-content-item')
+                for spec in specs:
+                    title_ele = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-title').text.strip()
+                    if title_ele in ("Mức giá","Diện tích", "Số toilet", "Số phòng ngủ"):
+                        value = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-value').text.strip()
+                        if not re.search(r'[a-zA-Z]',value.split(' ')[0]):
+                            value = float(value.split(' ')[0].replace(',', '.'))
+                        property_details[title_ele] = value
+                    if title_ele == "Nội thất":
+                        value = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-value').text.strip()
+                        property_details[title_ele] = value
 
-            specs = driver.find_elements(By.CSS_SELECTOR, 'div.re__pr-specs-content-item')
-            for spec in specs:
-                title_ele = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-title').text.strip()
-                if title_ele in ("Mức giá","Diện tích", "Số toilet", "Số phòng ngủ"):
-                    value = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-value').text.strip()
-                    value = float(value.split(' ')[0].replace(',', '.'))
-                    property_details[title_ele] = value
-                if title_ele == "Nội thất":
-                    value = spec.find_element(By.CSS_SELECTOR, 'span.re__pr-specs-content-item-value').text.strip()
-                    property_details[title_ele] = value
-
-            property_info = {
-                'ID': title,
-                'Địa chỉ': address,
-                'Ngày đăng tin': date
-            }
-            property_info.update(property_details)
-            property_info.update({"Link" : url})
-            property_list.append(property_info)
+                property_info = {
+                    'ID': title,
+                    'Địa chỉ': address,
+                    'Ngày đăng tin': date
+                }
+                property_info.update(property_details)
+                property_info.update({"Link" : url})
+                property_list.append(property_info)
 
         # Tạo DataFrame từ danh sách thông tin bất động sản
         df = pd.DataFrame(property_list)
@@ -91,3 +98,5 @@ def send_request(start_page, end_page):
     combined_data = combined_data[column_order]
     combined_data.to_csv('DSPhongTro.csv', index=False, encoding='utf-8-sig', header=True, sep='\t')
     driver.quit()
+
+send_request(171, 228)
