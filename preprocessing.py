@@ -43,7 +43,12 @@ raw_df['Nội thất'] = raw_df['Nội thất'].astype('category')
 
 start_date = pd.to_datetime('01/10/2024', format='%d/%m/%Y')
 end_date = pd.to_datetime('31/10/2024', format='%d/%m/%Y')
-raw_df = raw_df[(raw_df['Ngày đăng tin'] >= '1/10/2024') & (raw_df['Ngày đăng tin'] <= '31/10/2024')]
+
+#Loại bỏ các những dòng không được đăng vào tháng 10
+raw_df = raw_df[(raw_df['Ngày đăng tin'] >= start_date) & (raw_df['Ngày đăng tin'] <= end_date)]
+
+#Loại bỏ những dòng có địa chỉ bằng 0
+raw_df = raw_df[raw_df['Địa chỉ'].astype(int) != 0]
 
 #Lưu dữ liệu đã xử lý vào file csv
-raw_df.to_csv('./Data/DSPhongTro_DaXuLy.csv', encoding='utf-8-sig', header=True, sep='\t')
+raw_df.to_csv('./Data/DSPhongTro_DaXuLy.csv', encoding='utf-8-sig', header=True, sep='\t', index=False)
