@@ -7,7 +7,7 @@ import re
 import numpy as np 
 
 # Đường dẫn tới ChromeDriver
-chrome_driver_path = '/Users/nguyenngochoang/Documents/NMKHDL/chromedriver'
+chrome_driver_path = '/opt/homebrew/bin/chromedriver'
 
 # Tạo instance của WebDriver
 service = Service(executable_path=chrome_driver_path)
@@ -96,7 +96,7 @@ def send_request(start_page, end_page):
     column_order = ['ID', 'Địa chỉ', 'Diện tích', 'Số phòng ngủ', 'Số toilet', 'Nội thất', 
                     'Mức giá', 'Link', 'Ngày đăng tin']
     combined_data = combined_data[column_order]
-    combined_data.to_csv('DSPhongTro.csv', index=False, encoding='utf-8-sig', header=True, sep='\t')
+    combined_data.to_csv('DSPhongTro(1).csv', index=False, encoding='utf-8-sig', header=True, sep='\t')
     driver.quit()
 
-send_request(171, 228)
+send_request(1, 75)
