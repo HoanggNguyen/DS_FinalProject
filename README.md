@@ -1,2 +1,2 @@
 # DS_FinalProject
-Project for Introduction to Data Science
+This is Minh Hoang's assignment
