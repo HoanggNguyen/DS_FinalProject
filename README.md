@@ -30,6 +30,10 @@
 ## Nguồn dữ liệu
 Dữ liệu được cào từ website: [batdongsan.com.vn](https://batdongsan.com.vn)
 
+## Phân công công việc
+[Bảng phân công](https://docs.google.com/spreadsheets/d/1PmUz8fL2Ta1uO3mrcd1uBNhwyjUg6N9Q-W2Q9Q0XBMQ/edit?fbclid=IwY2xjawHgPmFleHRuA2FlbQIxMAABHd48Wbiivny-tfUaTgCLO6VUG9x_5GmO2WpVAK8EnFaffvCMtAmcAgBTEQ_aem_luYrZiIY6m-ymkoOYPlsrw&gid=0#gid=0)
+
+
 ## Lời cảm ơn
 Nhóm chân thành cảm ơn những giảng viên đã dày công truyền đạt kiến thức và hướng dẫn nhóm trong quá trình học và thực hiện đồ án này.
 
